@@ -6,6 +6,9 @@ using Microsoft.Azure.EventHubs;
 using System.Text;
 using System.Net.Http;
 using Microsoft.Extensions.Logging;
+using AzureTbleStrgFunc.Properties.Models;
+using Newtonsoft.Json;
+using System;
 
 namespace AzureTbleStrgFunc
 {
@@ -14,9 +17,27 @@ namespace AzureTbleStrgFunc
         private static HttpClient client = new HttpClient();
 
         [FunctionName("SaveToTableStroage")]
-        public static void Run([IoTHubTrigger("messages/events", Connection = "IotHubConnection")]EventData message, ILogger log)
-        {
-            log.LogInformation($"C# IoT Hub trigger function processed a message: {Encoding.UTF8.GetString(message.Body.Array)}");
+        [return: Table("Message2")]
+        public static DhtMessage Run([IoTHubTrigger("messages/events", Connection = "IotHubConnection1")]EventData message, ILogger log)
+        { try
+            {
+              
+                var payload = JsonConvert.DeserializeObject<DhtMessage>(Encoding.UTF8.GetString(message.Body.Array));
+                payload.PartitionKey = "dht";
+                // payload.PartitionKey = message.Properties["vendor"].ToString();
+                 payload.RowKey = Guid.NewGuid().ToString();
+
+                  log.LogInformation("Saving data to Table Storage.");
+                return payload;             
+            }
+            catch
+            {
+                log.LogInformation("Failed to Deserialize message. No data was save to Table Storage");
+            }
+
+                return null;
+            
         }
     }
+    
 }
