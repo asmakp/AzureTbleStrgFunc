@@ -23,9 +23,9 @@ namespace AzureTbleStrgFunc
             {
               
                 var payload = JsonConvert.DeserializeObject<DhtMessage>(Encoding.UTF8.GetString(message.Body.Array));
-                payload.PartitionKey = "dht";
-                // payload.PartitionKey = message.Properties["vendor"].ToString();
-                 payload.RowKey = Guid.NewGuid().ToString();
+                //payload.PartitionKey = "dht";
+                payload.PartitionKey = message.Properties["messageType"].ToString();
+                payload.RowKey = Guid.NewGuid().ToString();
 
                   log.LogInformation("Saving data to Table Storage.");
                 return payload;             

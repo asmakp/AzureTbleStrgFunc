@@ -27,6 +27,7 @@ namespace AzureTbleStrgFunc
 
             IEnumerable<DhtMessage> results = await cloudTable.ExecuteQuerySegmentedAsync(new TableQuery<DhtMessage>(), null);
 
+            //results = results.OrderBy(ts => ts.Timestamp);
             results = results.OrderByDescending(ts => ts.Timestamp).Take<DhtMessage>(10);
             
             //if (orderby == "desc")
